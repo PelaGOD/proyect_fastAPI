@@ -3,8 +3,7 @@ from typing import Optional
 from enum import Enum
 
 #Pydantic
-from pydantic import BaseModel
-from pydantic import Field
+from pydantic import BaseModel, Field, EmailStr,HttpUrl
 
 #FastAPI
 from fastapi import FastAPI
@@ -25,25 +24,46 @@ class Location(BaseModel):
     city: str
     state: str
     country: str
-
+    class Config:
+        schema_extra = {
+            'example': {
+                'city': 'Concepcion del Uruguay',
+                'state': 'Entre Rios',
+                'country': 'Argentina'
+            }
+        }
 class Person(BaseModel):
     first_name: str = Field(
         ...,
         min_length=1,
-        max_length=50
+        max_length=50,
+        example="Néstor Daniel"
     )
     last_name: str = Field(
         ...,
         min_length=1,
-        max_length=50
+        max_length=50,
+        example="Escobar"
     )
     age: int = Field(
         ...,
         gt=0,
-        le=115
+        le=115,
+        example=25
     )
-    hair_color: Optional[HairColor]= Field(default=None)
-    is_married: Optional[bool]= Field(default=None)
+    email: EmailStr = Field(
+        ...
+        )
+    website: HttpUrl = Field(
+        default=None
+        )
+    hair_color: Optional[HairColor]= Field(
+        default=None
+    )
+    is_married: Optional[bool]= Field(
+        default=None,
+        example=False
+    )
 
 @app.get("/")
 def home():
@@ -103,4 +123,5 @@ def update_person(
     results.update(location.dict())
 
     return results
+    return person
 
